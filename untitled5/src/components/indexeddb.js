@@ -1,4 +1,3 @@
-// Название базы данных и хранилища
 const dbName = 'myDatabase';
 const dbVersion = 1;
 const usersStoreName = 'users';
@@ -16,7 +15,6 @@ export function saveDataToIndexedDB(data) {
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
 
-            // Create or update object stores if needed
             if (!db.objectStoreNames.contains(usersStoreName)) {
                 db.createObjectStore(usersStoreName, { keyPath: 'id', autoIncrement: true });
             }
@@ -41,7 +39,6 @@ export function saveDataToIndexedDB(data) {
                 resolve();
             };
 
-            // Create a deep copy of the data without unclonable fields
             const dataToSave = JSON.parse(JSON.stringify(data));
 
             store.add(dataToSave);
