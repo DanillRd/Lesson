@@ -1,20 +1,16 @@
 <template>
   <div class="registration-cssave">
-    <button @click="toggleForm">Toggle Form</button>
     <div class="form-container">
       <form v-if="showForm" @submit.prevent="submitForm" class="login-form">
         <h3 class="text-center">Форма входа</h3>
         <div class="form-group">
           <input class="form-control item" type="text" name="username" maxlength="40" minlength="4" pattern="^[a-zA-Z0-9_.-]*$" id="username" placeholder="Логин" required v-model="formData.name">
-          <div v-if="formErrors.name" class="error">{{ formErrors.name }}</div>
-        </div> //
+        </div>
         <div class="form-group">
           <input class="form-control item" type="password" name="password" minlength="6" id="password" placeholder="Пароль" required v-model="formData.pass">
-          <div v-if="formErrors.pass" class="error">{{ formErrors.pass }}</div>
         </div>
         <div class="form-group">
           <input class="form-control item" type="number" name="age" id="age" placeholder="Возраст" required v-model="formData.age">
-          <div v-if="formErrors.age" class="error">{{ formErrors.age }}</div>
         </div>
         <div class="form-group">
           <button class="btn btn-primary btn-block create-account" type="submit">Вход в аккаунт</button>
@@ -167,6 +163,9 @@ body {
   border:none;
   color:white;
   margin-top:20px;
+}
+.error {
+  color: red;
 }
 
 @media (max-width: 576px) {
