@@ -7,14 +7,14 @@
         <div class="form-group">
           <input class="form-control item" type="text" name="username" maxlength="40" minlength="4" pattern="^[a-zA-Z0-9_.-]*$" id="username" placeholder="Логин" required v-model="formData.name">
           <div v-if="formErrors.name" class="error">{{ formErrors.name }}</div>
+        </div> //
+        <div class="form-group">
+          <input class="form-control item" type="password" name="password" minlength="6" id="password" placeholder="Пароль" required v-model="formData.pass">
+          <div v-if="formErrors.pass" class="error">{{ formErrors.pass }}</div>
         </div>
         <div class="form-group">
-          <input class="form-control item" type="password" name="password" minlength="6" id="password" placeholder="Пароль" required v-model="formData.age">
-          <div v-if="formErrors.pass" class="error">{{ formErrors.age }}</div>
-        </div>
-        <div class="form-group">
-          <input class="form-control item" type="number" name="age" id="age" placeholder="Возраст" required v-model="formData.email">
-          <div v-if="formErrors.email" class="error">{{ formErrors.email }}</div>
+          <input class="form-control item" type="number" name="age" id="age" placeholder="Возраст" required v-model="formData.age">
+          <div v-if="formErrors.age" class="error">{{ formErrors.age }}</div>
         </div>
         <div class="form-group">
           <button class="btn btn-primary btn-block create-account" type="submit">Вход в аккаунт</button>
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { saveDataToIndexedDB } from '/src/components/indexeddb';
 import { useRouter } from 'vue-router';
 
@@ -35,12 +35,13 @@ export default {
     const formData = ref({
       name: '',
       pass: '',
-      email: '',
+      age: '',
     });
 
     const formErrors = ref({
       name: '',
       pass: '',
+      age: '',
       email: '',
     });
 
@@ -51,13 +52,9 @@ export default {
         formData.value = {
           name: '',
           pass: '',
-          email: '',
+          age: '',
         };
-        formErrors.value = {
-          name: '',
-          pass: '',
-          email: '',
-        };
+        formErrors.value = {};
       }
       showForm.value = !showForm.value;
     };
@@ -69,26 +66,26 @@ export default {
         formErrors.value.name = 'Логин обязателен.';
       }
 
-      if (!formData.value.pass) {
-        formErrors.value.pass = 'Возраст обязателен.';
+      if (!formData.value.age) {
+        formErrors.value.age = 'Возраст обязателен.';
       } else if (isNaN(formData.value.age) || formData.value.age <= 0) {
-        formErrors.value.pass = 'Некорректный возраст.';
+        formErrors.value.age = 'Некорректный возраст.';
       }
 
-      if (!formData.value.email) {
-        formErrors.value.email = 'Email обязателен.';
-      } else if (!validateEmail(formData.value.email)) {
+      if (!validateEmail(formData.value.email)) {
         formErrors.value.email = 'Некорректный формат email.';
       }
 
-      saveDataToIndexedDB(formData.value)
-          .then(() => {
-            console.log('Данные успешно сохранены в IndexedDB:', formData.value);
-            router.push('/MoviePage'); // Используйте правильный путь к компоненту MoviePage
-          })
-          .catch((error) => {
-            console.error('Ошибка при сохранении данных в IndexedDB:', error);
-          });
+      if (Object.keys(formErrors.value).length === 0) {
+        saveDataToIndexedDB(formData.value)
+            .then(() => {
+              console.log('Данные успешно сохранены в IndexedDB:', formData.value);
+              router.push('/MoviePage'); // Правильный путь к компоненту MoviePage
+            })
+            .catch((error) => {
+              console.error('Ошибка при сохранении данных в IndexedDB:', error);
+            });
+      }
     };
 
     const validateEmail = (email) => {
@@ -96,12 +93,17 @@ export default {
       return emailPattern.test(email);
     };
 
+    const hasErrors = computed(() => {
+      return Object.values(formErrors.value).some(error => error !== '');
+    });
+
     return {
       showForm,
       formData,
       formErrors,
       toggleForm,
       submitForm,
+      hasErrors,
     };
   },
 };
@@ -118,7 +120,10 @@ html {
   background-size:cover;
   height:100%;
 }
-
+.text-center {
+  align-content: center;
+  text-align: center;
+}
 body {
   background-color:transparent;
 }

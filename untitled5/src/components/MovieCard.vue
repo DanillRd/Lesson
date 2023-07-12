@@ -1,21 +1,23 @@
 <template>
-  <div class="card" @click="toggleMovie" @mouseenter="startTimer" @mouseleave="resetTimer">
+  <div class="card" @mouseenter="startTimer" @mouseleave="resetTimer">
     <div class="card-inner" :class="{ 'flipped': isFlipped }">
-      <div class="card-front">
+      <div class="card-front" @click="toggleMovie">
         <div class="image-wrapper">
           <img :src="getImageUrl(movie.poster_path)" alt="Movie Poster">
         </div>
       </div>
-      <div class="card-back">
+      <div class="card-back" @click="toggleMovie">
         <div class="content">
           <h2>{{ movie.title }}</h2>
-          <p>{{ movie.overview }}</p>
+          <p class="overview">{{ truncateText(movie.overview, 150) }}</p>
+          <a class="movie-link" :href="'https://www.themoviedb.org/movie/' + movie.id" target="_blank"> Смотреть!</a>
           <slot name="actions"></slot>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 export default {
@@ -40,20 +42,30 @@ export default {
       this.isFlipped = !this.isFlipped;
     },
     startTimer() {
-      this.resetTimer();
-      this.timer = setTimeout(this.resetCard, 10000); // 10 секунд
+
+      this.timer = setTimeout(() => {
+        this.resetCard();
+      }, 10000); // 10 секунд
     },
     resetTimer() {
       clearTimeout(this.timer);
     },
     resetCard() {
       this.isFlipped = false;
+    },
+    truncateText(text, maxLength) {
+      if (text.length <= maxLength) {
+        return text;
+      } else {
+        return text.substring(0, maxLength) + '...';
+      }
     }
   },
+
   computed: {
     cardClass() {
       return {
-        'flipped': this.isFlipped
+        flipped: this.isFlipped
       };
     }
   }
@@ -62,11 +74,19 @@ export default {
 
 <style scoped>
 .card {
-  width: 240px; /* Измените на желаемую ширину карты */
-  height: 360px; /* Измените на желаемую высоту карты */
-  position: relative;
+  width: 240px; /* ширина карты */
+  height: 360px; /* высота карты */
+  position: sticky;
   perspective: 800px;
-  margin-bottom: 20px;
+  margin-bottom: 10px; /* Уменьшен отступ снизу */
+  border: 1px solid #ccc; /* Добавлен стиль границы */
+  border-radius: 4px; /* Добавлен стиль скругленных углов */
+  margin-left: 50px; /* Уменьшен отступ слева */
+  margin-right: 50px; /* Уменьшен отступ справа */
+  margin-top: 10px;
+  font-family: "Gill Sans", sans-serif;
+  background-size: cover;
+  background-color: lightseagreen;
 }
 
 .card-inner {
@@ -75,6 +95,10 @@ export default {
   position: absolute;
   transform-style: preserve-3d;
   transition: transform 0.6s;
+  border: 3px solid #ccc; /* Добавлен стиль границы */
+  border-radius: 4px; /* Добавлен стиль скругленных углов */
+  margin-top: auto;
+  background-color: #CD6600;
 }
 
 .card:hover .card-inner {
@@ -87,6 +111,7 @@ export default {
   height: 100%;
   position: absolute;
   backface-visibility: hidden;
+  background-color: #CD6600;
 }
 
 .card-front {
@@ -121,13 +146,14 @@ export default {
   padding: 20px;
   box-sizing: border-box;
   text-align: center;
+  margin-top: auto;
 }
 
 h2 {
-  font-size: 1.5rem;
+  text-align: center;
+  font-size: 1.1rem;
   margin-bottom: 10px;
 }
-
 p {
   font-size: 1rem;
   color: #555;
@@ -136,8 +162,26 @@ p {
 .flipped {
   transform: rotateY(180deg) scale(1.2);
 }
-.open {
-  transform: rotateY(180deg) scale(1.2); }
+p.overview {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 15px;
+  max-height: 120px; /* Измените на желаемую максимальную высоту текста */
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.movie-link {
+  color: #007bff;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out; /* добавляем плавный переход при наведении */
+  border: 2px solid #ccc;
+}
+.movie-link:hover {
+  color: #0056b3; /* изменяем цвет текста при наведении */
+  border: 2px solid #ccc;
+}
 </style>
+
+
 
 

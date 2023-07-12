@@ -11,9 +11,9 @@
           @click="openMovie(movie.id)"
           :class="{ 'open': movie.id === openMovieId }">
         <template v-slot:actions>
-          <button @click="addToFavorites(movie)">Добавить в избранное</button>
-          <button @click="addToWatchlist(movie)">Добавить в список просмотра</button>
-          <button class="delete-button" @click="deleteMovie(movie.id)">Удалить</button>
+          <button class="action-button" @click="addToFavorites(movie)">Добавить в избранное</button>
+          <button class="action-button" @click="addToWatchlist(movie)">Добавить в список просмотра</button>
+          <button class="action-button delete-button" @click="deleteMovie(movie.id)">Удалить</button>
         </template>
       </MovieCard>
     </div>
@@ -22,14 +22,20 @@
       <div class="list1">
         <h2>Список избранного</h2>
         <ul>
-          <li v-for="favoriteMovie in favoriteMovies" :key="favoriteMovie.id">{{ favoriteMovie.title }}</li>
+          <li v-for="favoriteMovie in favoriteMovies" :key="favoriteMovie.id">
+            {{ favoriteMovie.title }}
+            <button class="delete-button-list" @click="deleteFromList(favoriteMovie.id, 'favoriteMovies')">Удалить</button>
+          </li>
         </ul>
       </div>
 
       <div class="list2">
         <h2>Список просмотра</h2>
         <ul>
-          <li v-for="watchlistMovie in watchlistMovies" :key="watchlistMovie.id">{{ watchlistMovie.title }}</li>
+          <li v-for="watchlistMovie in watchlistMovies" :key="watchlistMovie.id">
+            {{ watchlistMovie.title }}
+            <button class="delete-button-list" @click="deleteFromList(watchlistMovie.id, 'watchlistMovies')">Удалить</button>
+          </li>
         </ul>
       </div>
     </div>
@@ -48,7 +54,7 @@ export default {
   },
   data() {
     return {
-      movies: [], // Ваш массив фильмов
+      movies: [], // Массив фильмов
       favoriteMovies: [], // Список избранного
       watchlistMovies: [], // Список просмотра
       openMovieId: null // Идентификатор текущего открытого фильма
@@ -82,14 +88,27 @@ export default {
       this.favoriteMovies = this.favoriteMovies.filter(movie => movie.id !== movieId);
       this.watchlistMovies = this.watchlistMovies.filter(movie => movie.id !== movieId);
     },
+    deleteFromList(movieId, listName) {
+      // Логика удаления фильма из указанного списка
+      if (listName === 'favoriteMovies') {
+        this.favoriteMovies = this.favoriteMovies.filter(movie => movie.id !== movieId);
+      } else if (listName === 'watchlistMovies') {
+        this.watchlistMovies = this.watchlistMovies.filter(movie => movie.id !== movieId);
+      }
+    },
+
     resetCard() {
       this.openMovieId = null;
       this.$refs.movieCards.forEach(card => card.resetCard());
     },
     openMovie(id) {
-      this.resetCard();
       this.openMovieId = id;
+
+      setTimeout(() => {
+        this.resetCard();
+      }, 15000);
     }
+
   }
 };
 </script>
@@ -110,9 +129,9 @@ export default {
   max-width: 600px;
   border: 1px solid #ccc;
   padding: 10px;
-  margin-bottom: 15px;
-}
 
+}
+/* Списки просмотров */
 .list1,
 .list2 {
   border: 1px solid #ccc;
@@ -141,7 +160,7 @@ export default {
 .list2 li {
   padding: 5px 0;
   border-bottom: 1px solid #ddd;
-  color: #666;
+  color: #678;
 }
 
 .list1 li:last-child,
@@ -158,14 +177,11 @@ h1 {
   text-align: center;
   margin-top: auto;
   color: #CD6600;
-  font-size: 40px
+  font-size: 40px;
+  position: sticky;
 }
 .open {
-  transform: rotateY(180deg) scale(1.2);
-}
-.movie-details {
-  margin-top: 20px;
-  text-align: center;
+  transform: rotateY(0deg) scale(1.1);
 }
 .movie-details h2 {
   font-size: 1.5rem;
@@ -174,5 +190,43 @@ h1 {
 .movie-details p {
   font-size: 1rem;
   color: #555;
+}
+/* Кнопки */
+.action-button {
+  border: 2px solid;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0);
+  outline-offset: 0px;
+  text-shadow: none;
+  transition: all 1250ms cubic-bezier(0.19, 1, 0.22, 1);
+  text-align: center;
+  text-decoration: none;
+  font-size: 18px;
+  color: blue;
+  background-color: #55d1ff;
+}
+
+.action-button:hover {
+  border: 2px solid;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, .5), 0 0 20px rgba(255, 255, 255, .2);
+  outline-color: rgba(255, 255, 255, 0);
+  outline-offset: 15px;
+  text-shadow: 1px 1px 2px #427388;
+  color: yellow;
+}
+.delete-button {
+  color: red;
+  border: 1px solid;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, .5), 0 0 20px rgba(255, 255, 255, .2);
+  outline-color: rgba(255, 255, 255, 0);
+  outline-offset: 15px;
+  text-shadow: 1px 1px 2px #427388;
+}
+.delete-button-list {
+  color: red;
+  border: 1px solid;
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, .5), 0 0 20px rgba(255, 255, 255, .2);
+  outline-color: rgba(255, 255, 255, 0);
+  outline-offset: 15px;
+  text-shadow: 1px 1px 2px #427388;
 }
 </style>
